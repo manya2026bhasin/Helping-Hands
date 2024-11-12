@@ -1,0 +1,43 @@
+.form-page {
+    background: url('../images/back1.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.signup-form {
+    max-height: 500px;
+}
+
+.form {
+    margin-top: 30px;
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 400px;
+}
+
+.form input[type="text"],
+.form input[type="number"],
+.signup-form input[type="password"],
+.form select {
+    width: 100%;
+    padding: 8px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+button {
+    padding: 10px;
+    background-color: green;
+    color: white;
+    border-radius: 8px;
+    border: none;
+    min-width: 70px;
+    cursor: pointer;
+}

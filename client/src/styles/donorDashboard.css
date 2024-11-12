@@ -1,0 +1,123 @@
+.icons i {
+    font-size: 34px;
+    margin: 15px;
+    margin-left: 30px;
+    cursor: pointer;
+}
+
+.side-bar {
+    position: fixed;
+    right: 0;
+    width: 100px;
+    border-left: 1px solid #f1f1f1;
+    padding: 7px;
+    text-align: center;
+    height: 90vh;
+}
+
+.side-bar div {
+    padding: 17px 0 17px 0;
+}
+
+.side-bar div:hover{
+    background-color: #f1f1f1;
+    cursor: pointer;
+}
+
+ .notification-badge {
+    position: absolute;
+    top: 2px;
+    right: 102px;
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+} 
+.notification-section {
+    position: absolute;
+    top: 7vh;
+    right: 2vw;
+    width: 300px;
+    max-height: 70vh;
+    overflow-y: auto;
+    z-index: 1000;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.notification-section h3 {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #333;
+    text-align: center;
+}
+
+.notification-section > div {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.notification-section p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.notification-section .location-button,
+.notification-section button {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 8px;
+    font-size: 0.85rem;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    text-align: center;
+}
+
+.notification-section .location-button:hover {
+    background-color: #0056b3;
+}
+
+.notification-section .not-available-button {
+    background-color: #6c757d;
+    margin-left: 10px;
+}
+
+.notification-section .not-available-button:hover {
+    background-color: #5a6268;
+}
+
+.notification-section > div > div {
+    padding: 10px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.notification-section > div > div:last-child {
+    border-bottom: none;
+}
+
+.notification-section .notification {
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.notification-section .no-notifications {
+    text-align: center;
+    color: #888;
+    font-size: 0.9rem;
+}
