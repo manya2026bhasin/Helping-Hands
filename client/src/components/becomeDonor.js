@@ -8,7 +8,7 @@ function BecomeDonor() {
     const [formData, setFormData] = useState({
         fullName: "",
         dob: "",
-        gender: "",
+        gender: "Male",
         contactNumber: "",
         email: "",
         bloodGroup: "A+",
@@ -17,13 +17,14 @@ function BecomeDonor() {
         allergies: "",
         allergyDetails: "",
         tattoos: "",
-        tattooDate: "",
         recentDonation: "",
         consent: false,
         password: "",
-        username: ""
+        username: "",
+        latitude: null,
+        longitude: null
     });
-
+    const geo = navigator.geolocation;
     const navigate = useNavigate();
     function handleSubmit(e) {
         e.preventDefault();
@@ -68,6 +69,29 @@ function BecomeDonor() {
               alert('Account already exists');
             }
           }
+    }
+
+    function findPatient() {
+        if (geo) {
+            geo.getCurrentPosition(setPosition, handleError);
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+    }
+
+    function setPosition(position) {
+        const { latitude, longitude } = position.coords;
+        setFormData(prevForm => ({
+            ...prevForm,
+            latitude: latitude,
+            longitude: longitude
+        }));
+        alert(`Latitude: ${latitude}, Longitude: ${longitude}`);
+    }
+
+    function handleError(error) {
+        console.error("Error occurred while getting location:", error);
+        alert("Unable to retrieve your location. Please enable location services in your device permissions.");
     }
 
     return (
@@ -151,6 +175,11 @@ function BecomeDonor() {
                             <label>Have you donated blood in the last 3 months?</label>
                             <input type="radio" name="recentDonation" value="yes" onChange={handleFormData} /> Yes
                             <input type="radio" name="recentDonation" value="no" onChange={handleFormData} /> No
+                        </div>
+
+                        <div>
+                            <label>Please allow us access to your location.</label>
+                            <button onClick={findPatient}>Allow access</button>
                         </div>
 
                         <div>
