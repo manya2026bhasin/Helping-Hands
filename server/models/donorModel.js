@@ -72,15 +72,43 @@ export const addDonor = async (donorData) => {
 };
 
 // Function to find all available donors
-export const findAvailableDonors = async () => {
+export const findAvailableDonors = async (bloodGroup, { latitude, longitude } ) => {
     try {
-        const availableDonors = await Donor.find({ availabilityStatus: true });
-        return availableDonors;
+        // Fetch all available donors
+        const donors = await Donor.find({ availabilityStatus: true, bloodGroup: bloodGroup });
+
+        const radiusInKm = 10; // 10 km
+        const earthRadiusKm = 6371; // Earth's radius in km
+
+        const nearbyDonors = donors.filter(donor => {
+            const donorLat = donor.location.latitude;
+            const donorLon = donor.location.longitude;
+
+            // Haversine formula
+            const latDiff = degreesToRadians(latitude - donorLat);
+            const lonDiff = degreesToRadians(longitude - donorLon);
+
+            const a = Math.sin(latDiff / 2) ** 2 +
+                Math.cos(degreesToRadians(latitude)) *
+                Math.cos(degreesToRadians(donorLat)) *
+                Math.sin(lonDiff / 2) ** 2;
+
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            const distance = earthRadiusKm * c; // Distance in km
+
+            return distance <= radiusInKm; // Return true if donor is within 10 km
+        });
+
+        return nearbyDonors;
     } catch (error) {
         console.error("Error finding available donors:", error);
         throw error;
     }
 };
+
+// Helper function to convert degrees to radians
+const degreesToRadians = (degrees) => (degrees * Math.PI) / 180;
+
 
 // Function to find all donors
 export const findAllDonors = async () => {
@@ -89,6 +117,15 @@ export const findAllDonors = async () => {
         return allDonors;
     } catch (error) {
         console.error("Error finding all donors:", error);
+        throw error;
+    }
+};
+
+export const findDonorByEmail = async (email) => {
+    try {
+        return await Donor.findOne({ "contactInfo.email": email });
+    } catch (error) {
+        console.error("Error finding donor by email:", error);
         throw error;
     }
 };

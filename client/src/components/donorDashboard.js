@@ -1,16 +1,51 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import "../styles/donorDashboard.css";
+import { jwtDecode } from 'jwt-decode';
 import bloodDropImage from "../images/blood-drop.png";
 import io from "socket.io-client";
+import axios from "axios";
+
 const socket = io.connect("http://localhost:5000");
 function DonorDashboard() {
     const navigate = useNavigate();
     const [notifications, setNotifications] = useState([]);
     const [showNotificationPanel, setShowNotificationPanel] = useState(false);
+    const [donorBloodGroup, setDonorBloodGroup] = useState('');
+
+    function getEmailFromToken() {
+        const token = localStorage.getItem('token');
+        if (!token) return null;
+        try {
+            const decodedToken = jwtDecode(token);
+            return decodedToken.email;
+        } catch (error) {
+            console.error('Failed to decode token:', error);
+            return null;
+        }
+    }
+
+    const fetchDonorBloodGroup = async () => {
+        const email = getEmailFromToken();
+        console.log("email",email);
+        if (!email) return;
+
+        try {
+            const response = await axios.get(`http://localhost:5000/api/donors?email=${email}`);
+            if (response.data && response.data.donor.bloodGroup) {
+                setDonorBloodGroup(response.data.donor.bloodGroup);
+            }
+        } catch (error) {
+            console.error('Error fetching donor blood group:', error);
+        }
+    };
+
     useEffect(() => {
         socket.on("receive_message", (data) => {
+        fetchDonorBloodGroup();
+        if(donorBloodGroup === data.form.bloodGroup){
             setNotifications((prevNotifications) => [...prevNotifications, data.form]);
+        }
         });
 
         // Clean up the event listener on component unmount

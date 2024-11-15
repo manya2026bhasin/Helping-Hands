@@ -7,7 +7,8 @@ import nodemailer from 'nodemailer';
 import http from "http";
 import mongoose from "mongoose";
 import { Server } from "socket.io";
-import { addDonor, findAvailableDonors, findAllDonors } from "./models/donorModel.js";  // Import MongoDB functions
+import { addDonor, findAvailableDonors, findAllDonors, findDonorByEmail } from "./models/donorModel.js";  // Import MongoDB functions
+import { log } from "console";
 
 dotenv.config();
 
@@ -39,7 +40,7 @@ app.post('/api/signup', async (req, res) => {
     console.log('Data received:', req.body);
 
     try {
-        // Check if username already exists
+        // Check if email already exists
         const existingUsers = await findAllDonors();
         const userExists = existingUsers.some(user => user.contactInfo.email === email);
 
@@ -49,7 +50,8 @@ app.post('/api/signup', async (req, res) => {
 
         // Add new user
         await addDonor({fullname: fullName, password, dob, gender, bloodGroup, contactInfo: {email: email, phone: contactNumber}, location: {latitude, longitude}, availability: true });
-        const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ email: email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        console.log(token);
         res.status(200).json({ message: 'Account created', token });
     } catch (error) {
         console.error('Error processing form submission:', error);
@@ -66,7 +68,8 @@ app.post('/api/login', async (req, res) => {
         const user = existingUsers.find(u => u.contactInfo.email === username);
 
         if (user && user.password === password) {
-            const token = jwt.sign({ username }, process.env.JWT_SECRET, { expiresIn: '1h' });
+            const token = jwt.sign({ email: username }, process.env.JWT_SECRET, { expiresIn: '1h' });
+            console.log(token);
             res.status(200).json({ message: 'Login successful', token });
         } else {
             res.status(401).json({ message: user ? 'Incorrect password' : 'Email not found' });
@@ -111,6 +114,22 @@ app.post("/api/find-donor", async (req, res) => {
         res.status(500).json({ message: "Error sending emails" });
     }
 });
+
+app.get('/api/donors', async (req, res) => {
+    const email = req.query.email; // Use query parameters
+    try {
+        const donor = await findDonorByEmail(email);
+        console.log(donor);
+        if (donor) {
+            res.status(200).json({ donor });
+        } else {
+            res.status(404).json({ error: "Donor not found" });
+        }
+    } catch (error) {
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
 
 // Socket.IO setup for real-time messaging
 io.on("connection", (socket) => {
