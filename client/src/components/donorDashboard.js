@@ -102,7 +102,7 @@ function DonorDashboard() {
                                 >
                                     View on Google Maps
                                 </button>
-
+                                <button className="available-button">Available</button>
                                 <button className="not-available-button">Not available</button>
                             </div>
                         ))}

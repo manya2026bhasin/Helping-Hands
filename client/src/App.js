@@ -5,6 +5,7 @@ import FindDonor from "./components/findDonor";
 import BecomeDonor from "./components/becomeDonor";
 import DonorDashboard from "./components/donorDashboard";
 import LoginForm from "./components/loginForm";
+import FindDonorLoader from "./components/findDonorLoader";
 import './App.css';
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/find-donor-form" element={<FindDonor />} />
+        <Route path="/find-donor-loader" element={<FindDonorLoader />} />
         <Route path="/become-donor-form" element={<BecomeDonor />} />
         <Route path="/donor-dashboard" element={<DonorDashboard />} />
         <Route path="/login-form" element={<LoginForm />} />

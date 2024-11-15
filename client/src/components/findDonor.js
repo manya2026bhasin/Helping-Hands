@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import "../styles/findDonor.css";
 import io from "socket.io-client";
@@ -16,7 +17,7 @@ function FindDonor() {
         longitude: null
     });
     const geo = navigator.geolocation;
-    
+    const navigate = useNavigate();
     async function handleSubmit(e) {
         e.preventDefault();
         if(form.latitude == null){
@@ -26,6 +27,7 @@ function FindDonor() {
             const result = await axios.post('http://localhost:5000/api/find-donor', form);
             if (result.status === 200) {
                 socket.emit("send_message", { form });
+                navigate('/find-donor-loader');
             }
         }
         catch (error) {
