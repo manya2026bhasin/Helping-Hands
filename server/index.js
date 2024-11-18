@@ -8,6 +8,7 @@ import http from "http";
 import mongoose from "mongoose";
 import { Server } from "socket.io";
 import Patient from "./models/donation.js";
+import { findPatientById } from "./models/donation.js";
 import { addDonor, findAvailableDonors, findAllDonors, findDonorByEmail } from "./models/donorModel.js";  // Import MongoDB functions
 import { log } from "console";
 
@@ -145,6 +146,67 @@ app.get('/api/donors', async (req, res) => {
     }
 });
 
+app.get('/api/donors/notifications', async (req, res) => {
+    const { email } = req.query;
+
+    try {
+        const donor = await findDonorByEmail(email);
+        if (!donor) {
+            return res.status(404).json({ error: "Donor not found" });
+        }
+        console.log(donor.notifications);
+        res.json({ notifications: donor.notifications });
+    } catch (error) {
+        console.error("Error fetching notifications:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
+app.post('/api/donors/notifications', async (req, res) => {
+    const { patientId, bloodGroup, timestamp, status } = req.body;
+
+    try {
+        // Find donors with the matching blood group
+        const donors = await findAllDonors(); // Assumes this fetches all donors
+        const specificDonors = donors.filter(donor => donor.bloodGroup === bloodGroup); // Use `filter` to get matching donors
+
+        if (!specificDonors || specificDonors.length === 0) {
+            return res.status(404).json({ error: "No donors found for this blood group" });
+        }
+
+        // Save the notification to each donor
+        const notification = { patientId, timestamp, status };
+
+        await Promise.all(
+            specificDonors.map(async (donor) => {
+                donor.notifications.push(notification); // Assuming `notifications` is an array in donor schema
+                await donor.save(); // Save the updated donor document
+            })
+        );
+
+        res.status(201).json({ message: "Notification saved to donor(s)" });
+    } catch (error) {
+        console.error("Error saving notification:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
+
+app.get('/api/patients/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const patient = await findPatientById(id);
+        if (!patient) {
+            return res.status(404).json({ error: "Patient not found" });
+        }
+        console.log("patient",patient);
+        res.status(200).json(patient);
+    } catch (error) {
+        console.error("Error fetching patient details:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
 
 io.on("connection", (socket) => {
     console.log(`User connected: ${socket.id}`);

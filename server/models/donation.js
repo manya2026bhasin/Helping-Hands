@@ -53,6 +53,15 @@ const patientSchema = new mongoose.Schema({
 // Apply AutoIncrement plugin
 patientSchema.plugin(AutoIncrementPlugin, { inc_field: 'serialId' });
 
+export const findPatientById = async (patientId) => {
+    try {
+        return await Patient.findOne({ "serialId": patientId });
+    } catch (error) {
+        console.error("Error finding patient by patientId:", error);
+        throw error;
+    }
+};
+
 const Patient = mongoose.model('Patient', patientSchema);
 
 export default Patient;

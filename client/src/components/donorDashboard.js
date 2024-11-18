@@ -41,28 +41,79 @@ function DonorDashboard() {
         }
     };
 
+    const fetchNotificationDetails = async () => {
+        const email = getEmailFromToken();
+        if (!email) return;
+
+        try {
+            // Fetch notifications
+            const response = await axios.get(`http://localhost:5000/api/donors/notifications?email=${email}`);
+            if (response.data && response.data.notifications) {
+                // Fetch details for each notification
+                console.log("i am in fetch notification");
+                console.log(response.data.notifications);
+                const detailedNotifications = await Promise.all(
+                    response.data.notifications.map(async (notification) => {
+                        try {
+                            const patientResponse = await axios.get(`http://localhost:5000/api/patients/${notification.patientId}`);
+                            console.log("patient response: ", patientResponse.data);
+                            return {
+                                ...notification,
+                                ...patientResponse.data, // Merge patient details into the notification
+                            };
+                        } catch (error) {
+                            console.error(`Error fetching details for patientId ${notification.patientId}:`, error);
+                            return { ...notification, error: "Failed to fetch details" };
+                        }
+                    })
+                );
+
+                setNotifications(detailedNotifications);
+                console.log("notifications:",notifications);
+            }
+        } catch (error) {
+            console.error("Error fetching notifications:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchNotificationDetails();
+    }, []);
+
     useEffect(() => {
         const initializeSocket = async () => {
-            await fetchDonorBloodGroup(); // Fetch blood group before setting up listener
-    
-            socket.on("receive_message", (data) => {
+            socket.on("receive_message", async (data) => {
                 console.log("Message received:", data);
-                if (donorBloodGroup === data.form.bloodGroup) {
-                    setNotifications((prevNotifications) => [
-                        ...prevNotifications,
-                        { ...data.form, patientId: data.patientId }
-                    ]);
+
+                const newNotification = {
+                    patientId: data.patientId,
+                    bloodGroup: data.form.bloodGroup,
+                    timestamp: new Date().toISOString(),
+                    status: "unread", // Default status
+                };
+
+                // Save notification to backend
+                try {
+                    const response = await axios.post("http://localhost:5000/api/donors/notifications", newNotification);
+                    if (response.status === 201) {
+                        console.log("Notification saved to backend:", response.data);
+                        fetchNotificationDetails(); // Refresh notifications
+                    } else {
+                        console.error("Failed to save notification:", response);
+                    }
+                } catch (error) {
+                    console.error("Error posting notification to backend:", error);
                 }
             });
         };
-    
+
         initializeSocket();
-    
+
         return () => {
             socket.off("receive_message");
         };
-    }, [socket]);
-    
+    }, []);
+
 
     const openLocationInMaps = (latitude, longitude) => {
         const mapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
@@ -107,17 +158,17 @@ function DonorDashboard() {
                     <div>
                         {notifications.map((notification, index) => (
                             <div key={index}>
-                                <p><strong>Patient Name:</strong> {notification.pname}</p>
-                                <p><strong>Age:</strong> {notification.age}</p>
-                                <p><strong>Blood Group:</strong> {notification.bloodGroup}</p>
+                                <p><strong>Patient Name:</strong> {notification.fullname || "Unknown"}</p>
+                                <p><strong>Age:</strong> {notification.age || "N/A"}</p>
+                                <p><strong>Blood Group:</strong> {notification.bloodGroup || "N/A"}</p>
 
                                 <button
-                                    onClick={() => openLocationInMaps(notification.latitude, notification.longitude)}
+                                    onClick={() => openLocationInMaps(notification.location.latitude, notification.location.longitude)}
                                     className="location-button"
                                 >
                                     View on Google Maps
                                 </button>
-                                <button className="available-button" onClick={() => handleAvailableButton(notification.patientId)}>Available</button>
+                                <button className="available-button" onClick={() => handleAvailableButton(notification.serialId)}>Available</button>
                                 <button className="not-available-button">Not available</button>
                             </div>
                         ))}
