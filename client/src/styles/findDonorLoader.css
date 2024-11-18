@@ -1,3 +1,30 @@
+.donor-found {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 94vh;
+    background-color: #e8f5e9; /* Light green background for a positive feel */
+    font-family: 'Arial', sans-serif;
+    color: #2e7d32; /* Dark green text for contrast */
+    padding: 20px;
+    text-align: center;
+}
+
+.donor-found h1 {
+    font-size: 48px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #1b5e20; /* Darker green for emphasis */
+    text-transform: uppercase;
+}
+
+.donor-found p {
+    font-size: 20px;
+    line-height: 1.6;
+    color: #2e7d32;
+}
+
 .loading-page {
     display: flex;
     flex-direction: column;

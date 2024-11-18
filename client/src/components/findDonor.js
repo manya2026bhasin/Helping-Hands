@@ -2,17 +2,18 @@ import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import "../styles/findDonor.css";
-import io from "socket.io-client";
-const socket = io.connect("http://localhost:5000");
+import socket from "./socket";
 
 function FindDonor() {
     const [form, setForm] = useState({
         pname: "",
-        age: "",
+        dob: "",
         gender: "",
         height: "",
         weight: "",
         bloodGroup: "A+",
+        contactNumber: "",
+        email: "",
         latitude: null,
         longitude: null
     });
@@ -26,7 +27,9 @@ function FindDonor() {
         try {
             const result = await axios.post('http://localhost:5000/api/find-donor', form);
             if (result.status === 200) {
-                socket.emit("send_message", { form });
+                const { patientId } = result.data;
+                socket.emit("register_patient", patientId);
+                socket.emit("send_message", { form, patientId });
                 navigate('/find-donor-loader');
             }
         }
@@ -75,19 +78,19 @@ function FindDonor() {
                     <div className='form-body'></div>
                     <div>
                         <span>Name : </span>
-                        <input type="text" name="pname" placeholder="Enter your name" onChange={handleFormData} required />
+                        <input type="text" name="pname" value={form.pname} placeholder="Enter your name" onChange={handleFormData} required />
                     </div>
                     <div>
-                        <span>Age : </span>
-                        <input type="number" name="age" onChange={handleFormData} required />
-                    </div>
+                            <label>Date of Birth:</label>
+                            <input type="date" name="dob" value={form.dob} onChange={handleFormData} required />
+                        </div>
                     <div>
                         <span>Gender : </span>
                         <label>
-                            <input type="radio" name="gender" value="male" onChange={handleFormData} /> Male
-                        </label>{' '}
+                            <input type="radio" name="gender" value="Male" onChange={handleFormData} /> Male
+                        </label><br/>
                         <label>
-                            <input type="radio" name="gender" value="female" onChange={handleFormData} /> Female
+                            <input type="radio" name="gender" value="Female" onChange={handleFormData} /> Female
                         </label><br />
                     </div>
                     <div>
@@ -111,6 +114,15 @@ function FindDonor() {
                             <option value="O-">O-</option>
                         </select>
                     </div>
+                    <div>
+                            <label>Contact Number:</label>
+                            <input type="tel" name="contactNumber" value={form.contactNumber} onChange={handleFormData} required />
+                        </div>
+
+                        <div>
+                            <label>Email Address:</label>
+                            <input type="email" name="email" value={form.email} onChange={handleFormData} required />
+                        </div>
                     <div>
                         Please allow us to access your current location
                         <button type="button" onClick={findPatient}>Access Location</button>

@@ -3,10 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import "../styles/donorDashboard.css";
 import { jwtDecode } from 'jwt-decode';
 import bloodDropImage from "../images/blood-drop.png";
-import io from "socket.io-client";
 import axios from "axios";
+import socket from "./socket";
 
-const socket = io.connect("http://localhost:5000");
 function DonorDashboard() {
     const navigate = useNavigate();
     const [notifications, setNotifications] = useState([]);
@@ -27,13 +26,15 @@ function DonorDashboard() {
 
     const fetchDonorBloodGroup = async () => {
         const email = getEmailFromToken();
-        console.log("email",email);
+        console.log("email", email);
         if (!email) return;
 
         try {
             const response = await axios.get(`http://localhost:5000/api/donors?email=${email}`);
             if (response.data && response.data.donor.bloodGroup) {
                 setDonorBloodGroup(response.data.donor.bloodGroup);
+                console.log(response.data.donor.bloodGroup);
+                console.log(donorBloodGroup);
             }
         } catch (error) {
             console.error('Error fetching donor blood group:', error);
@@ -41,18 +42,27 @@ function DonorDashboard() {
     };
 
     useEffect(() => {
-        socket.on("receive_message", (data) => {
-        fetchDonorBloodGroup();
-        if(donorBloodGroup === data.form.bloodGroup){
-            setNotifications((prevNotifications) => [...prevNotifications, data.form]);
-        }
-        });
-
-        // Clean up the event listener on component unmount
+        const initializeSocket = async () => {
+            await fetchDonorBloodGroup(); // Fetch blood group before setting up listener
+    
+            socket.on("receive_message", (data) => {
+                console.log("Message received:", data);
+                if (donorBloodGroup === data.form.bloodGroup) {
+                    setNotifications((prevNotifications) => [
+                        ...prevNotifications,
+                        { ...data.form, patientId: data.patientId }
+                    ]);
+                }
+            });
+        };
+    
+        initializeSocket();
+    
         return () => {
             socket.off("receive_message");
         };
-    }, []);
+    }, [socket]);
+    
 
     const openLocationInMaps = (latitude, longitude) => {
         const mapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
@@ -61,7 +71,12 @@ function DonorDashboard() {
 
     const toggleNotificationPanel = (e) => {
         setShowNotificationPanel(!showNotificationPanel);
-    }
+    };
+
+    const handleAvailableButton = (patientId) => {
+        const email = getEmailFromToken();
+        socket.emit("donor_available", { email, patientId });
+    };
 
     return (
         <div>
@@ -102,7 +117,7 @@ function DonorDashboard() {
                                 >
                                     View on Google Maps
                                 </button>
-                                <button className="available-button">Available</button>
+                                <button className="available-button" onClick={() => handleAvailableButton(notification.patientId)}>Available</button>
                                 <button className="not-available-button">Not available</button>
                             </div>
                         ))}

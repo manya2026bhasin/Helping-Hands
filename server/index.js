@@ -7,6 +7,7 @@ import nodemailer from 'nodemailer';
 import http from "http";
 import mongoose from "mongoose";
 import { Server } from "socket.io";
+import Patient from "./models/donation.js";
 import { addDonor, findAvailableDonors, findAllDonors, findDonorByEmail } from "./models/donorModel.js";  // Import MongoDB functions
 import { log } from "console";
 
@@ -82,9 +83,20 @@ app.post('/api/login', async (req, res) => {
 
 // Find Donor
 app.post("/api/find-donor", async (req, res) => {
-    const { bloodGroup, latitude, longitude } = req.body;
+    const { pname, gender, dob, contactNumber, email, bloodGroup, latitude, longitude } = req.body;
 
     try {
+        console.log(req.body);
+        const patient = new Patient({
+            fullname: pname,
+            dob,
+            gender,
+            bloodGroup,
+            contactInfo: { email, phone: contactNumber },
+            location: { latitude, longitude }
+        });
+
+        const savedPatient = await patient.save();
         // Find available donors in the specified radius
         const availableDonors = await findAvailableDonors(bloodGroup, { latitude, longitude });
         const emailAddresses = availableDonors.map(donor => donor.contactInfo.email);
@@ -108,7 +120,10 @@ app.post("/api/find-donor", async (req, res) => {
             await transporter.sendMail({ ...emailOptions, to: email });
         }
 
-        res.json({ message: "Emails sent successfully!" });
+        res.json({ 
+            message: "Emails sent successfully!",
+            patientId: savedPatient.serialId 
+        });
     } catch (error) {
         console.error("Error processing form submission:", error);
         res.status(500).json({ message: "Error sending emails" });
@@ -131,14 +146,48 @@ app.get('/api/donors', async (req, res) => {
 });
 
 
-// Socket.IO setup for real-time messaging
 io.on("connection", (socket) => {
     console.log(`User connected: ${socket.id}`);
+    socket.removeAllListeners();
+    // Event to allow a patient to join their specific room
+    socket.on("register_patient", (patientId) => {
+        socket.join(patientId);
+        console.log(`Patient with ID ${patientId} joined room ${patientId}`);
+    });
+
     socket.on("send_message", (data) => {
         console.log(data);
         socket.broadcast.emit("receive_message", data);
+        // socket.join(data.patientId);
+    });
+
+    // Handle donor availability and notify specific patient
+    socket.on("donor_available", (data) => {
+        const { email, patientId } = data; // Ensure patientId is passed in data
+        console.log(`Donor available: ${email} for Patient ID: ${patientId}`);
+        // socket.join(patientId);
+        // Notify only the specified patient's room
+        io.to(patientId).emit("donor_found", {
+            donorEmail: email,
+            message: "A donor is available for your request.",
+            patientId: patientId
+        });
+        console.log(`Notified patient in room ${patientId}`);
+        
+    });
+
+
+    // socket.on("donor_available", (data) => {
+    //     console.log(data);
+    //     socket.to(data.patientId).emit("donor_found", data);
+    
+    // });
+    // Optional: Clean up or log when users disconnect
+    socket.on("disconnect", () => {
+        console.log(`User disconnected: ${socket.id}`);
     });
 });
+
 
 app.get('/', (req, res) => {
     res.send('Server is working!');
