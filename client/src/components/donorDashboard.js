@@ -129,6 +129,21 @@ function DonorDashboard() {
         socket.emit("donor_available", { email, patientId });
     };
 
+    const deleteNotification = async(patientId) => {
+        const email = getEmailFromToken();
+        try {
+            const response = await axios.post("http://localhost:5000/api/donors/deletenotifications", {email,patientId});
+            if (response.status === 201) {
+                console.log("Notification deleted:", response.data);
+                fetchNotificationDetails(); // Refresh notifications
+            } else {
+                console.error("Failed to delete notification:", response);
+            }
+        } catch (error) {
+            console.error("Error deleting notification:", error);
+        }
+    };
+
     return (
         <div>
             <div className="header">
@@ -159,8 +174,8 @@ function DonorDashboard() {
                         {notifications.map((notification, index) => (
                             <div key={index}>
                                 <p><strong>Patient Name:</strong> {notification.fullname || "Unknown"}</p>
-                                <p><strong>Age:</strong> {notification.age || "N/A"}</p>
                                 <p><strong>Blood Group:</strong> {notification.bloodGroup || "N/A"}</p>
+                                <p><strong>Contact no.:</strong> {notification.contactInfo.phone || "N/A"}</p>
 
                                 <button
                                     onClick={() => openLocationInMaps(notification.location.latitude, notification.location.longitude)}
@@ -169,7 +184,7 @@ function DonorDashboard() {
                                     View on Google Maps
                                 </button>
                                 <button className="available-button" onClick={() => handleAvailableButton(notification.serialId)}>Available</button>
-                                <button className="not-available-button">Not available</button>
+                                <button className="not-available-button" onClick={() => deleteNotification(notification.serialId)}>Not available</button>
                             </div>
                         ))}
                     </div>

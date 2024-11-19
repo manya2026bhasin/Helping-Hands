@@ -22,7 +22,7 @@ mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 }).then(() => console.log("Connected to MongoDB"))
-  .catch(error => console.error("MongoDB connection error:", error));
+    .catch(error => console.error("MongoDB connection error:", error));
 
 // Middleware setup
 app.use(cors());
@@ -51,7 +51,7 @@ app.post('/api/signup', async (req, res) => {
         }
 
         // Add new user
-        await addDonor({fullname: fullName, password, dob, gender, bloodGroup, contactInfo: {email: email, phone: contactNumber}, location: {latitude, longitude}, availability: true });
+        await addDonor({ fullname: fullName, password, dob, gender, bloodGroup, contactInfo: { email: email, phone: contactNumber }, location: { latitude, longitude }, availability: true });
         const token = jwt.sign({ email: email }, process.env.JWT_SECRET, { expiresIn: '1h' });
         console.log(token);
         res.status(200).json({ message: 'Account created', token });
@@ -121,9 +121,9 @@ app.post("/api/find-donor", async (req, res) => {
             await transporter.sendMail({ ...emailOptions, to: email });
         }
 
-        res.json({ 
+        res.json({
             message: "Emails sent successfully!",
-            patientId: savedPatient.serialId 
+            patientId: savedPatient.serialId
         });
     } catch (error) {
         console.error("Error processing form submission:", error);
@@ -200,10 +200,33 @@ app.get('/api/patients/:id', async (req, res) => {
         if (!patient) {
             return res.status(404).json({ error: "Patient not found" });
         }
-        console.log("patient",patient);
+        console.log("patient", patient);
         res.status(200).json(patient);
     } catch (error) {
         console.error("Error fetching patient details:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
+app.post('/api/donors/deletenotifications', async (req, res) => {
+    const { email, patientId } = req.body;
+
+    try {
+        // Find donors with the matching blood group
+        const donor = await findDonorByEmail(email);
+
+        if (!donor) {
+            return res.status(404).json({ error: "No donor found for this email" });
+        }
+
+        // delete the notification
+        donor.notifications = donor.notifications.filter(notification => notification.patientId !== patientId);
+
+        await donor.save();
+
+        res.status(201).json({ message: "Notification deleted" });
+    } catch (error) {
+        console.error("Error saving notification:", error);
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
@@ -224,25 +247,38 @@ io.on("connection", (socket) => {
     });
 
     // Handle donor availability and notify specific patient
-    socket.on("donor_available", (data) => {
+    socket.on("donor_available", async (data) => {
         const { email, patientId } = data; // Ensure patientId is passed in data
         console.log(`Donor available: ${email} for Patient ID: ${patientId}`);
-        // socket.join(patientId);
-        // Notify only the specified patient's room
-        io.to(patientId).emit("donor_found", {
-            donorEmail: email,
-            message: "A donor is available for your request.",
-            patientId: patientId
-        });
-        console.log(`Notified patient in room ${patientId}`);
-        
+
+        try {
+            // Fetch donor details by email
+            const donor = await findDonorByEmail(email);
+
+            if (!donor) {
+                console.error(`No donor found with email: ${email}`);
+                return;
+            }
+
+            // Notify only the specified patient's room
+            io.to(patientId).emit("donor_found", {
+                donorEmail: email,
+                donorPhone: donor.contactInfo.phone, // Add the donor's phone number here
+                message: "A donor is available for your request.",
+                patientId: patientId
+            });
+
+            console.log(`Notified patient in room ${patientId} with donor's phone number.`);
+        } catch (error) {
+            console.error(`Error fetching donor details for email ${email}:`, error);
+        }
     });
 
 
     // socket.on("donor_available", (data) => {
     //     console.log(data);
     //     socket.to(data.patientId).emit("donor_found", data);
-    
+
     // });
     // Optional: Clean up or log when users disconnect
     socket.on("disconnect", () => {

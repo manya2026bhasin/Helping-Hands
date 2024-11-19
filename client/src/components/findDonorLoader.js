@@ -6,12 +6,14 @@ import socket from "./socket";
 
 function FindDonorLoader() {
     const [donorFound, setDonorFound] = useState(false);
+    const [donorDetails, setDonorDetails] = useState({});
 
     useEffect(() => {
 
         socket.on("donor_found", (data) => {
             console.log(data);
             setDonorFound(true);
+            setDonorDetails(data);
         });
         return () => {
             socket.off("donor_found");
@@ -24,7 +26,9 @@ function FindDonorLoader() {
             {donorFound ? (
                 <div className="donor-found">
                     <h1>Donor Found!</h1>
-                    <p>A donor has been located and will be in touch with you shortly.</p>
+                    <p>A donor has been located!! Here are the details.</p>
+                    <p>{donorDetails.donorEmail}</p>
+                    <p>{donorDetails.donorPhone}</p>
                 </div>
             ) : (
                 <div className="loading-page">

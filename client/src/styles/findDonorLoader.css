@@ -4,25 +4,60 @@
     justify-content: center;
     align-items: center;
     height: 94vh;
-    background-color: #e8f5e9; /* Light green background for a positive feel */
-    font-family: 'Arial', sans-serif;
-    color: #2e7d32; /* Dark green text for contrast */
-    padding: 20px;
+    background: linear-gradient(135deg, #e8f5e9, #c8e6c9); /* Gradient background for a fresh look */
+    font-family: 'Roboto', sans-serif;
+    color: #2e7d32;
+    padding: 30px;
     text-align: center;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .donor-found h1 {
-    font-size: 48px;
-    font-weight: bold;
-    margin-bottom: 20px;
-    color: #1b5e20; /* Darker green for emphasis */
+    font-size: 52px;
+    font-weight: 700;
+    margin-bottom: 25px;
+    color: #1b5e20;
     text-transform: uppercase;
+    letter-spacing: 1.5px; /* Adds spacing between letters for readability */
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .donor-found p {
-    font-size: 20px;
-    line-height: 1.6;
+    font-size: 18px;
+    line-height: 1.8;
+    margin: 10px 0;
     color: #2e7d32;
+}
+
+.donor-found p:nth-child(3),
+.donor-found p:nth-child(4) {
+    background: #ffffff; /* White background to highlight donor details */
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin: 10px 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    font-weight: 600; /* Emphasize donor details */
+    color: #1b5e20;
+}
+
+.donor-found p:nth-child(3)::before,
+.donor-found p:nth-child(4)::before {
+    content: attr(data-label); /* Use this attribute in HTML for labels */
+    display: block;
+    font-size: 14px;
+    font-weight: 400;
+    color: #388e3c;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.donor-found p:nth-child(3)::before {
+    content: "Donor Email:";
+}
+
+.donor-found p:nth-child(4)::before {
+    content: "Donor Phone:";
 }
 
 .loading-page {
