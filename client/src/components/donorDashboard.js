@@ -6,6 +6,7 @@ import bloodDropImage from "../images/blood-drop.png";
 import axios from "axios";
 import socket from "./socket";
 import Resources from "./resources";
+import HealthStatus from "./healthStatus";
 
 function DonorDashboard() {
     const navigate = useNavigate();
@@ -31,7 +32,7 @@ function DonorDashboard() {
             case 'Home':
                 return <Resources getEmailFromToken={getEmailFromToken} />;
             case 'Health Status':
-                return <Resources getEmailFromToken={getEmailFromToken} />;
+                return <HealthStatus getEmailFromToken={getEmailFromToken} />;
             case 'Rewards':
                 return <Resources getEmailFromToken={getEmailFromToken} />
             case 'Donation History':
@@ -180,7 +181,7 @@ function DonorDashboard() {
                 </div>
             </div>
             <div className="side-bar">
-                <div  onClick={() => setActiveFeature('Home')}><i class="fa-solid fa-house"></i><br></br>Home</div>
+                <div onClick={() => setActiveFeature('Home')}><i class="fa-solid fa-house"></i><br></br>Home</div>
                 <div onClick={() => setActiveFeature('Health Status')}><i class="fa-solid fa-heart-pulse"></i><br></br>Health status</div>
                 <div onClick={() => setActiveFeature('Rewards')}><i class="fa-solid fa-gift"></i><br></br>Rewards</div>
                 <div onClick={() => setActiveFeature('Donation History')}><i class="fa-solid fa-droplet"></i><br></br>Donation History</div>
@@ -199,14 +200,16 @@ function DonorDashboard() {
                                 <p><strong>Blood Group:</strong> {notification.bloodGroup || "N/A"}</p>
                                 <p><strong>Contact no.:</strong> {notification.contactInfo.phone || "N/A"}</p>
 
+                                <div className="notification-buttons">
+                                <button className="available-button" onClick={() => handleAvailableButton(notification.serialId)}>Available</button>
+                                <button className="not-available-button" onClick={() => deleteNotification(notification.serialId)}>Not available</button>
                                 <button
                                     onClick={() => openLocationInMaps(notification.location.latitude, notification.location.longitude)}
                                     className="location-button"
                                 >
-                                    View on Google Maps
+                                    View Location
                                 </button>
-                                <button className="available-button" onClick={() => handleAvailableButton(notification.serialId)}>Available</button>
-                                <button className="not-available-button" onClick={() => deleteNotification(notification.serialId)}>Not available</button>
+                                </div>
                             </div>
                         ))}
                     </div>

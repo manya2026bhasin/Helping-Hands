@@ -1,0 +1,76 @@
+.donor-health-main-div {
+    display: flex;
+}
+
+.donor-health-card {
+    display: flex;
+    flex-direction: column;
+    width: 25vw;
+    height: fit-content;
+    background-color: #f9f6f6;
+    border: 1px solid #efeded;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 5vw;
+    text-align: center;
+}
+
+.donor-health-card div p{
+    font-size: 20px;
+}
+
+.donor-health-card div button {
+    font-size: 20px;
+    padding: 10px;
+}
+
+.donor-health-form {
+    display: flex;
+    flex-direction: column;
+    width: 25vw;
+    background-color: #f9f6f6;
+    border: 1px solid #efeded;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 5vw;
+    margin-left: 0;
+    font-size: 20px;
+}
+
+.donor-health-form form div {
+    padding: 5px;
+    margin: 5px;
+}
+
+.donor-health-form form div input {
+    padding: 2px;
+    margin-left: 20px;
+}
+
+.donor-health-form form button {
+    font-size: 20px;
+}
+
+.availability-div {
+    display: flex;
+    flex-direction: column;
+    min-width: 25vw;
+    height: fit-content;
+    background-color: #f9f6f6;
+    border: 1px solid #efeded;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 5vw;
+    margin-left: 0;
+    text-align: center;
+}
+
+.available-heading {
+    color: green;
+}
+
+.not-available-heading {
+    color: red;
+}
+
+

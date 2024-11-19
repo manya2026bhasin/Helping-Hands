@@ -67,6 +67,16 @@ const donorSchema = new mongoose.Schema({
             default: 'unread'
           }
         }
+      ],
+      donations: [
+        {
+            patientId:{
+                type: Number
+            },
+            date: {
+                type: Date
+            }
+        }
       ]
 });
 

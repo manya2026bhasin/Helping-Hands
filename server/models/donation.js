@@ -48,6 +48,10 @@ const patientSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+    donorId: {
+        type: String,
+        unique: true
+    }
 });
 
 // Apply AutoIncrement plugin

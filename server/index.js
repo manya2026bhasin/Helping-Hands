@@ -9,6 +9,7 @@ import mongoose from "mongoose";
 import { Server } from "socket.io";
 import Patient from "./models/donation.js";
 import { findPatientById } from "./models/donation.js";
+import DonorHealth from "./models/donorHealth.js";
 import { addDonor, findAvailableDonors, findAllDonors, findDonorByEmail } from "./models/donorModel.js";  // Import MongoDB functions
 import { log } from "console";
 
@@ -228,6 +229,65 @@ app.post('/api/donors/deletenotifications', async (req, res) => {
     } catch (error) {
         console.error("Error saving notification:", error);
         res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
+app.get("/api/donor/health/:email", async (req, res) => {
+    const { email } = req.params;
+
+    try {
+        const donor = await findDonorByEmail(email);
+        if (!donor) {
+            return res.status(401).json({ success: false, message: "Donor not found" });
+        }
+
+        const donorId = donor._id;
+        const donorHealth = await DonorHealth.findOne({ donorId });
+        if (!donorHealth) {
+            return res.status(404).json({ success: false, message: "Donor health data not found" });
+        }
+        res.status(200).json({ success: true, donorHealth });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+app.post("/api/donor/health", async (req, res) => {
+    const { email, height, weight, haemoglobin, lastDonationDate, recentIllnesses } = req.body;
+
+    try {
+        // Calculate availability
+        const threeMonthsAgo = new Date();
+        threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+        const isAvailable = haemoglobin >= 12.5 &&
+            (!lastDonationDate || new Date(lastDonationDate) < threeMonthsAgo) &&
+            (!recentIllnesses || recentIllnesses.trim() === "");
+
+        // Upsert donor health data
+        const donor = await findDonorByEmail(email);
+        if (!donor) {
+            return res.status(401).json({ success: false, message: "Donor not found" });
+        }
+
+        const donorId = donor._id;
+        const donorHealth = await DonorHealth.findOneAndUpdate(
+            { donorId },
+            {
+                donorId,
+                height,
+                weight,
+                haemoglobin,
+                lastDonationDate,
+                recentIllnesses,
+                isAvailable,
+            },
+            { upsert: true, new: true }
+        );
+
+        donor.availabilityStatus = isAvailable;
+        res.status(200).json({ success: true, donorHealth });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
     }
 });
 
