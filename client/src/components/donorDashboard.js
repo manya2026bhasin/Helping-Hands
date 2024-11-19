@@ -5,11 +5,13 @@ import { jwtDecode } from 'jwt-decode';
 import bloodDropImage from "../images/blood-drop.png";
 import axios from "axios";
 import socket from "./socket";
+import Resources from "./resources";
 
 function DonorDashboard() {
     const navigate = useNavigate();
     const [notifications, setNotifications] = useState([]);
     const [showNotificationPanel, setShowNotificationPanel] = useState(false);
+    const [activeFeature, setActiveFeature] = useState('home');
     const [donorBloodGroup, setDonorBloodGroup] = useState('');
 
     function getEmailFromToken() {
@@ -23,6 +25,23 @@ function DonorDashboard() {
             return null;
         }
     }
+
+    const renderFeatureContent = () => {
+        switch (activeFeature) {
+            case 'Home':
+                return <Resources getEmailFromToken={getEmailFromToken} />;
+            case 'Health Status':
+                return <Resources getEmailFromToken={getEmailFromToken} />;
+            case 'Rewards':
+                return <Resources getEmailFromToken={getEmailFromToken} />
+            case 'Donation History':
+                return <Resources getEmailFromToken={getEmailFromToken} />
+            case 'Resources and Guidelines':
+                return <Resources getEmailFromToken={getEmailFromToken} />
+            default:
+                return null;
+        }
+    };
 
     const fetchDonorBloodGroup = async () => {
         const email = getEmailFromToken();
@@ -69,7 +88,7 @@ function DonorDashboard() {
                 );
 
                 setNotifications(detailedNotifications);
-                console.log("notifications:",notifications);
+                console.log("notifications:", notifications);
             }
         } catch (error) {
             console.error("Error fetching notifications:", error);
@@ -129,10 +148,10 @@ function DonorDashboard() {
         socket.emit("donor_available", { email, patientId });
     };
 
-    const deleteNotification = async(patientId) => {
+    const deleteNotification = async (patientId) => {
         const email = getEmailFromToken();
         try {
-            const response = await axios.post("http://localhost:5000/api/donors/deletenotifications", {email,patientId});
+            const response = await axios.post("http://localhost:5000/api/donors/deletenotifications", { email, patientId });
             if (response.status === 201) {
                 console.log("Notification deleted:", response.data);
                 fetchNotificationDetails(); // Refresh notifications
@@ -161,11 +180,14 @@ function DonorDashboard() {
                 </div>
             </div>
             <div className="side-bar">
-                <div><i class="fa-solid fa-house"></i><br></br>Home</div>
-                <div><i class="fa-solid fa-heart-pulse"></i><br></br>Health status</div>
-                <div><i class="fa-solid fa-gift"></i><br></br>Rewards</div>
-                <div><i class="fa-solid fa-droplet"></i><br></br>Donation History</div>
-                <div><i class="fa-solid fa-book"></i><br></br>Resources and Guidelines</div>
+                <div  onClick={() => setActiveFeature('Home')}><i class="fa-solid fa-house"></i><br></br>Home</div>
+                <div onClick={() => setActiveFeature('Health Status')}><i class="fa-solid fa-heart-pulse"></i><br></br>Health status</div>
+                <div onClick={() => setActiveFeature('Rewards')}><i class="fa-solid fa-gift"></i><br></br>Rewards</div>
+                <div onClick={() => setActiveFeature('Donation History')}><i class="fa-solid fa-droplet"></i><br></br>Donation History</div>
+                <div onClick={() => setActiveFeature('Resources and Guidelines')}><i class="fa-solid fa-book"></i><br></br>Resources and Guidelines</div>
+            </div>
+            <div className="dashboard-content">
+                {renderFeatureContent()}
             </div>
             {/* Notification Section */}
             {showNotificationPanel && <div className="notification-section">
