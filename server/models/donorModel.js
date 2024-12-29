@@ -52,7 +52,7 @@ const donorSchema = new mongoose.Schema({
     },
     availabilityStatus: {
         type: Boolean,
-        default: true // true if available to donate, false otherwise
+        default: false // true if available to donate, false otherwise
     },
     notifications: [
         {
@@ -182,6 +182,21 @@ export const getNotificationsForDonor = async (donorId) => {
         return donor.notifications;
     } catch (error) {
         console.error("Error retrieving notifications for donor:", error);
+        throw error;
+    }
+};
+
+export const updateDonations = async (donorId, patientId, date) => {
+    try {
+        const donor = await Donor.findById(donorId);
+        if (!donor) {
+            throw new Error("Donor not found");
+        }
+
+        donor.donations.push({patientId, date});
+        await donor.save();
+    } catch (error) {
+        console.error("Error adding donation data to donor:", error);
         throw error;
     }
 };

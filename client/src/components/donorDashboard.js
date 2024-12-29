@@ -7,6 +7,9 @@ import axios from "axios";
 import socket from "./socket";
 import Resources from "./resources";
 import HealthStatus from "./healthStatus";
+import DonationHistory from "./donationHistory";
+import DonorHome from "./donorHome.js";
+import Rewards from "./rewards";
 
 function DonorDashboard() {
     const navigate = useNavigate();
@@ -30,17 +33,17 @@ function DonorDashboard() {
     const renderFeatureContent = () => {
         switch (activeFeature) {
             case 'Home':
-                return <Resources getEmailFromToken={getEmailFromToken} />;
+                return <DonorHome getEmailFromToken={getEmailFromToken} />;
             case 'Health Status':
                 return <HealthStatus getEmailFromToken={getEmailFromToken} />;
             case 'Rewards':
-                return <Resources getEmailFromToken={getEmailFromToken} />
+                return <Rewards getEmailFromToken={getEmailFromToken} />
             case 'Donation History':
-                return <Resources getEmailFromToken={getEmailFromToken} />
+                return <DonationHistory getEmailFromToken={getEmailFromToken} />
             case 'Resources and Guidelines':
                 return <Resources getEmailFromToken={getEmailFromToken} />
             default:
-                return null;
+                return <DonorHome getEmailFromToken={getEmailFromToken} />;
         }
     };
 
@@ -70,8 +73,6 @@ function DonorDashboard() {
             const response = await axios.get(`http://localhost:5000/api/donors/notifications?email=${email}`);
             if (response.data && response.data.notifications) {
                 // Fetch details for each notification
-                console.log("i am in fetch notification");
-                console.log(response.data.notifications);
                 const detailedNotifications = await Promise.all(
                     response.data.notifications.map(async (notification) => {
                         try {

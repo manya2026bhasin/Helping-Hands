@@ -1,0 +1,122 @@
+/* DonorHome.css */
+.donor-home-container {
+    font-family: Arial, sans-serif;
+    color: #333;
+    margin: 0 auto;
+    padding: 20px;
+    max-width: 1200px;
+}
+
+.welcome-banner {
+    text-align: center;
+    background: #ffe4e1;
+    padding: 40px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+}
+
+.welcome-banner h1 {
+    color: #d92027;
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.welcome-banner .cta-buttons {
+    margin-top: 20px;
+}
+
+.cta-btn {
+    padding: 10px 20px;
+    font-size: 1rem;
+    margin: 5px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.cta-btn.outline {
+    background: none;
+    border: 2px solid #d92027;
+    color: #d92027;
+}
+
+.features-section {
+    margin-bottom: 40px;
+}
+
+.features-section h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.features-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.feature-card {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    width: calc(25% - 20px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.learn-more {
+    background: #d92027;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+.stats-section {
+    background: #f0f8ff;
+    padding: 30px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.events-section {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.events-section .register-now {
+    background: #d92027;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.success-stories {
+    background: #fff4e6;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.inspiration-counter {
+    background: #f0f0f0;
+    padding: 30px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+}
+
+.inspiration-counter h3 {
+    color: #d92027;
+    font-size: 1.5rem;
+    margin-bottom: 5px;
+}

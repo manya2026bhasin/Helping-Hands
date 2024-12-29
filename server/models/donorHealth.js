@@ -11,4 +11,24 @@ const donorHealthSchema = new mongoose.Schema({
 });
 
 const DonorHealth = mongoose.model("DonorHealth", donorHealthSchema);
+
+export const updateAvailability = async (donorId,isAvailable) => {
+    try {
+        const updatedDonor = await DonorHealth.findOneAndUpdate(
+            { donorId },
+            { isAvailable: isAvailable },
+            { new: true }
+        );
+
+        if (!updatedDonor) {
+            throw new Error(`Donor with ID ${donorId} not found`);
+        }
+
+        return updatedDonor;
+    } catch (error) {
+        console.error("Error updating donor's availability:", error);
+        throw error;
+    }
+};
+
 export default DonorHealth;

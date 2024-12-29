@@ -9,8 +9,10 @@ import mongoose from "mongoose";
 import { Server } from "socket.io";
 import Patient from "./models/donation.js";
 import { findPatientById } from "./models/donation.js";
+import DonationHistory from "./models/donationHistory.js";
 import DonorHealth from "./models/donorHealth.js";
-import { addDonor, findAvailableDonors, findAllDonors, findDonorByEmail } from "./models/donorModel.js";  // Import MongoDB functions
+import { updateAvailability } from "./models/donorHealth.js";
+import { addDonor, findAvailableDonors, findAllDonors, findDonorByEmail, updateDonations } from "./models/donorModel.js";  // Import MongoDB functions
 import { log } from "console";
 
 dotenv.config();
@@ -169,7 +171,7 @@ app.post('/api/donors/notifications', async (req, res) => {
     try {
         // Find donors with the matching blood group
         const donors = await findAllDonors(); // Assumes this fetches all donors
-        const specificDonors = donors.filter(donor => donor.bloodGroup === bloodGroup); // Use `filter` to get matching donors
+        const specificDonors = donors.filter(donor => donor.bloodGroup === bloodGroup && donor.availabilityStatus === true); // Use `filter` to get matching donors
 
         if (!specificDonors || specificDonors.length === 0) {
             return res.status(404).json({ error: "No donors found for this blood group" });
@@ -291,6 +293,95 @@ app.post("/api/donor/health", async (req, res) => {
     }
 });
 
+app.post("/api/otherdonors/deletenotifications", async (req, res) => {
+    const { email, patientId } = req.body;
+
+    try {
+        const donors = await findAllDonors();
+        const donor = await findDonorByEmail(email);
+        if (!donor) {
+            return res.status(401).json({ success: false, message: "Donor not found" });
+        }
+        for (const d of donors) {
+            if (d.contactInfo.email !== email) {
+                console.log("donor email",d.email);
+                d.notifications = d.notifications.filter(
+                    (notification) => notification.patientId !== patientId
+                );
+                await d.save();
+            }
+        }
+
+        res.status(200).json({ success: true, message: "Notifications updated for all donors except the specified donor" });
+
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+app.post("/api/donors/history", async (req, res) => {
+    const { email, patientId } = req.body;
+
+    try {
+        const donor = await findDonorByEmail(email);
+        const donorId = donor._id;
+        console.log(donorId);
+        const recipient = await findPatientById(patientId);
+        console.log(recipient);
+        const recipientId = recipient.serialId;
+        const newRecord = new DonationHistory({
+            donorId,
+            recipientId,
+            recipientName: recipient.fullname,
+            donationDate: new Date(),
+            bloodGroup: recipient.bloodGroup
+        });
+        console.log("new record",newRecord);
+        const savedRecord = await newRecord.save();
+        await updateDonations(donorId, patientId, new Date());
+        res.status(200).json({ success: true, data: savedRecord });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+app.get("/api/donors/history/:email", async (req, res) => {
+    const { email } = req.params;
+
+    try {
+        console.log(email);
+        const donor = await findDonorByEmail(email);
+
+        if (!donor) {
+            return res.status(404).json({ success: false, message: "Donor not found" });
+        }
+
+        const history = await DonationHistory.find({ donorId: donor._id}).sort({ donationDate: -1 });
+        console.log("history: ",history);
+        res.status(200).json({ success: true, data: history });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+app.get("/api/donors/points/:email", async (req,res) => {
+    const { email } = req.params;
+
+    try {
+        console.log(email);
+        const donor = await findDonorByEmail(email);
+
+        if (!donor) {
+            return res.status(404).json({ success: false, message: "Donor not found" });
+        }
+
+        const points = donor.donations.length * 50;
+
+        res.status(200).json({ success: true, data: points });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
 io.on("connection", (socket) => {
     console.log(`User connected: ${socket.id}`);
     socket.removeAllListeners();
