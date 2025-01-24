@@ -17,6 +17,7 @@ function DonorDashboard() {
     const [showNotificationPanel, setShowNotificationPanel] = useState(false);
     const [activeFeature, setActiveFeature] = useState('home');
     const [donorBloodGroup, setDonorBloodGroup] = useState('');
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
     function getEmailFromToken() {
         const token = localStorage.getItem('token');
@@ -135,6 +136,9 @@ function DonorDashboard() {
         };
     }, []);
 
+    const toggleSidebar = (e) => {
+        setIsSidebarOpen(!isSidebarOpen);
+    };
 
     const openLocationInMaps = (latitude, longitude) => {
         const mapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
@@ -179,14 +183,16 @@ function DonorDashboard() {
                     <i className="fa-solid fa-bell" onClick={toggleNotificationPanel}></i>
 
                     <i class="fa-solid fa-user"></i>
+
+                    <i class="fa fa-bars hamburger-menu" onClick={toggleSidebar}></i>
                 </div>
             </div>
-            <div className="side-bar">
-                <div onClick={() => setActiveFeature('Home')}><i class="fa-solid fa-house"></i><br></br>Home</div>
-                <div onClick={() => setActiveFeature('Health Status')}><i class="fa-solid fa-heart-pulse"></i><br></br>Health status</div>
-                <div onClick={() => setActiveFeature('Rewards')}><i class="fa-solid fa-gift"></i><br></br>Rewards</div>
-                <div onClick={() => setActiveFeature('Donation History')}><i class="fa-solid fa-droplet"></i><br></br>Donation History</div>
-                <div onClick={() => setActiveFeature('Resources and Guidelines')}><i class="fa-solid fa-book"></i><br></br>Resources and Guidelines</div>
+            <div className={`side-bar ${isSidebarOpen ? '' : 'hide-sidebar'}`}>
+                <div onClick={() => setActiveFeature('Home')}><i className="fa-solid fa-house"></i><br></br>Home</div>
+                <div onClick={() => setActiveFeature('Health Status')}><i className="fa-solid fa-heart-pulse"></i><br></br>Health status</div>
+                <div onClick={() => setActiveFeature('Rewards')}><i className="fa-solid fa-gift"></i><br></br>Rewards</div>
+                <div onClick={() => setActiveFeature('Donation History')}><i className="fa-solid fa-droplet"></i><br></br>Donation History</div>
+                <div onClick={() => setActiveFeature('Resources and Guidelines')}><i className="fa-solid fa-book"></i><br></br>Resources and Guidelines</div>
             </div>
             <div className="dashboard-content">
                 {renderFeatureContent()}

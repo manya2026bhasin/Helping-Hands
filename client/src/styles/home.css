@@ -37,6 +37,11 @@
     font-size: 19px;
 }
 
+.links p:hover{
+    transform: scale(1.1);
+    cursor: pointer;
+}
+
 .hero {
     display: flex;
     justify-content: center;

@@ -146,3 +146,61 @@
     color: #888;
     font-size: 0.9rem;
 }
+
+.hamburger-menu {
+    display: none;
+}
+
+@media screen and (max-width: 850px) {
+    .side-bar {
+        position: fixed;
+        right: 0;
+        top: 10vh;
+        width: 100px;
+        border-left: 1px solid #f1f1f1;
+        padding: 7px;
+        text-align: center;
+        height: 90vh;
+        z-index: 1000;
+        background-color: white;
+    }
+    .hamburger-menu {
+        display: inline-block;
+    }
+    .icons .fa-bars {
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+}
+
+@media screen and (max-width: 510px) {
+    .header {
+        position: fixed;
+        width: 100vw;
+        z-index: 1000;
+        background-color: white;
+        height: 25vh;
+    }
+
+    .side-bar {
+        position: fixed;
+        right: 0;
+        top: 25vh;
+        width: 100px;
+        border-left: 1px solid #f1f1f1;
+        padding: 7px;
+        text-align: center;
+        height: 90vh;
+        z-index: 1000;
+        background-color: white;
+    }
+    .dashboard-content { 
+        width: 90vw;
+        position: absolute;
+        top: 25vh;
+    }
+}
+
+.hide-sidebar {
+    display: none;
+}
