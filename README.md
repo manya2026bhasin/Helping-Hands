@@ -116,9 +116,6 @@ We welcome contributions! Please follow these steps:
    ```
 5. Create a pull request.
 
-## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ## Acknowledgements
 - Special thanks to all contributors and supporters of this project.
 - Inspired by the spirit of saving lives through blood donation.
