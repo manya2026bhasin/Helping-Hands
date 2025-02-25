@@ -18,7 +18,7 @@ import { log } from "console";
 dotenv.config();
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT;
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
