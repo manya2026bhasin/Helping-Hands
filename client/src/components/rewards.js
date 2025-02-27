@@ -8,7 +8,7 @@ import API_BASE_URL from '../apiconfig';
 
 const Rewards = ({getEmailFromToken}) => {
   const email = getEmailFromToken();
-  const [totalPoints, setTotalPoints] = useState(400); // Replace with actual points logic from backend
+  const [totalPoints, setTotalPoints] = useState(0); // Replace with actual points logic from backend
   const [badges] = useState([
     { name: "Bronze Donor", pointsRequired: 100, image: bronzeBadge },
     { name: "Silver Donor", pointsRequired: 500, image: silverBadge },
