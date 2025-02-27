@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import API_BASE_URL from '../apiconfig.js';
 import "../styles/becomeDonor.css";
 
 function BecomeDonor() {
@@ -58,7 +59,7 @@ function BecomeDonor() {
         e.preventDefault();
         if(formData.username && formData.password){
             try{
-              const result = await axios.post('http://localhost:5000/api/signup', formData);
+              const result = await axios.post(`${API_BASE_URL}/api/signup`, formData);
               if(result.status === 200){
                 localStorage.setItem('token', result.data.token);
                 navigate('/donor-dashboard');

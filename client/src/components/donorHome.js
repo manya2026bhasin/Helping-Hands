@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from "react";
 import axios from "axios";
+import API_BASE_URL from "../apiconfig";
 import "../styles/donorHome.css";
 
 const DonorHome = ({getEmailFromToken}) => {
@@ -9,7 +10,7 @@ const DonorHome = ({getEmailFromToken}) => {
         
         const fetchLives = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/api/donors/points/${email}`);
+                const response = await axios.get(`${API_BASE_URL}/api/donors/points/${email}`);
                 setLives((response.data.data)/50);
             } catch (error) {
                 console.error("Error fetching lives saved:", error);

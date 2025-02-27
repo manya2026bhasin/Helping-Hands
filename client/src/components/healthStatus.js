@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../styles/healthStatus.css";
 import axios from "axios";
+import API_BASE_URL from "../apiconfig";
 
 function HealthStatus({ getEmailFromToken }) {
     const [healthData, setHealthData] = useState({});
@@ -11,7 +12,7 @@ function HealthStatus({ getEmailFromToken }) {
     const fetchHealthStatus = async () => {
         try {
             const email = getEmailFromToken();
-            const donorHealthResponse = await axios.get(`http://localhost:5000/api/donor/health/${email}`);
+            const donorHealthResponse = await axios.get(`${API_BASE_URL}/api/donor/health/${email}`);
             setHealthData(donorHealthResponse.data.donorHealth);
             setAvailable(donorHealthResponse.data.donorHealth.isAvailable);
         } catch (error) {
@@ -36,7 +37,7 @@ function HealthStatus({ getEmailFromToken }) {
         };
 
         try {
-            const response = await axios.post("http://localhost:5000/api/donor/health", data);
+            const response = await axios.post(`${API_BASE_URL}/api/donor/health`, data);
             if (response.status === 200) {
                 fetchHealthStatus();
                 setFormVisible(false);

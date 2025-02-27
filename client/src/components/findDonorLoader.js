@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/findDonorLoader.css";
+import API_BASE_URL from "../apiconfig";
 import socket from "./socket";
 
 function FindDonorLoader() {
@@ -37,7 +38,7 @@ function FindDonorLoader() {
         try{
             const email = donorsDetails[0].donorEmail;
             const patientId = donorsDetails[0].patientId;
-            const response = await axios.post("http://localhost:5000/api/otherdonors/deletenotifications", { email, patientId });
+            const response = await axios.post(`${API_BASE_URL}/api/otherdonors/deletenotifications`, { email, patientId });
             if (response.status === 200) {
                 console.log("Notification deleted for other donors:", response.data);
                 setDonorConfirmed(true);
@@ -54,7 +55,7 @@ function FindDonorLoader() {
         try{
             const email = donorsDetails[0].donorEmail;
             const patientId = donorsDetails[0].patientId;
-            const response = await axios.post("http://localhost:5000/api/donors/history", { email, patientId });
+            const response = await axios.post(`${API_BASE_URL}/api/donors/history`, { email, patientId });
             if (response.status === 200) {
                 console.log("donation added to records");
             } else {

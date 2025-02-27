@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import "../styles/findDonor.css";
+import API_BASE_URL from "../apiconfig";
 
 function LoginForm() {
     const [form, setForm] = useState({
@@ -13,7 +14,7 @@ function LoginForm() {
         e.preventDefault();
         if (form.username != "" && form.password != "") {
             try {
-                const result = await axios.post('http://localhost:5000/api/login', form);
+                const result = await axios.post(`${API_BASE_URL}/api/login`, form);
                 if (result.status === 200) {
                     localStorage.setItem('token', result.data.token);
                     navigate('/donor-dashboard');

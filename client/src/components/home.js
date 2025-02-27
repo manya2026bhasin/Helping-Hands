@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import bloodDropImage from "../images/blood-drop.png";
 import { useNavigate } from 'react-router-dom';
 import "../styles/home.css";
+
 function Home() {
     const navigate = useNavigate();
     return (

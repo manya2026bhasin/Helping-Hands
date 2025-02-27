@@ -170,7 +170,7 @@ app.post('/api/donors/notifications', async (req, res) => {
 
     try {
         // Find donors with the matching blood group
-        const donors = await findAllDonors(); // Assumes this fetches all donors
+        const donors = await findAllDonors();
         const specificDonors = donors.filter(donor => donor.bloodGroup === bloodGroup && donor.availabilityStatus === true); // Use `filter` to get matching donors
 
         if (!specificDonors || specificDonors.length === 0) {

@@ -4,6 +4,7 @@ import silverBadge from "../images/silver-donor.png";
 import goldBadge from "../images/gold-donor.png";
 import axios from 'axios';
 import '../styles/rewards.css';
+import API_BASE_URL from '../apiconfig';
 
 const Rewards = ({getEmailFromToken}) => {
   const email = getEmailFromToken();
@@ -23,7 +24,7 @@ const Rewards = ({getEmailFromToken}) => {
 
     const fetchPoints = async () => {
         try {
-            const response = await axios.get(`http://localhost:5000/api/donors/points/${email}`);
+            const response = await axios.get(`${API_BASE_URL}/api/donors/points/${email}`);
             setTotalPoints(response.data.data);
             console.log(totalPoints);
         } catch (error) {

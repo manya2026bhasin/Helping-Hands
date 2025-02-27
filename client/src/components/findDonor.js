@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import "../styles/findDonor.css";
 import socket from "./socket";
+import API_BASE_URL from "../apiconfig";
 
 function FindDonor() {
     const [form, setForm] = useState({
@@ -25,7 +26,7 @@ function FindDonor() {
             alert("please provide access to your location");
         }
         try {
-            const result = await axios.post('http://localhost:5000/api/find-donor', form);
+            const result = await axios.post(`${API_BASE_URL}/api/find-donor`, form);
             if (result.status === 200) {
                 const { patientId } = result.data;
                 socket.emit("register_patient", patientId);

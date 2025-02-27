@@ -10,6 +10,7 @@ import HealthStatus from "./healthStatus";
 import DonationHistory from "./donationHistory";
 import DonorHome from "./donorHome.js";
 import Rewards from "./rewards";
+import API_BASE_URL from "../apiconfig.js";
 
 function DonorDashboard() {
     const navigate = useNavigate();
@@ -54,7 +55,7 @@ function DonorDashboard() {
         if (!email) return;
 
         try {
-            const response = await axios.get(`http://localhost:5000/api/donors?email=${email}`);
+            const response = await axios.get(`${API_BASE_URL}/api/donors?email=${email}`);
             if (response.data && response.data.donor.bloodGroup) {
                 setDonorBloodGroup(response.data.donor.bloodGroup);
                 console.log(response.data.donor.bloodGroup);
@@ -71,13 +72,13 @@ function DonorDashboard() {
 
         try {
             // Fetch notifications
-            const response = await axios.get(`http://localhost:5000/api/donors/notifications?email=${email}`);
+            const response = await axios.get(`${API_BASE_URL}/api/donors/notifications?email=${email}`);
             if (response.data && response.data.notifications) {
                 // Fetch details for each notification
                 const detailedNotifications = await Promise.all(
                     response.data.notifications.map(async (notification) => {
                         try {
-                            const patientResponse = await axios.get(`http://localhost:5000/api/patients/${notification.patientId}`);
+                            const patientResponse = await axios.get(`${API_BASE_URL}/api/patients/${notification.patientId}`);
                             console.log("patient response: ", patientResponse.data);
                             return {
                                 ...notification,
@@ -116,7 +117,7 @@ function DonorDashboard() {
 
                 // Save notification to backend
                 try {
-                    const response = await axios.post("http://localhost:5000/api/donors/notifications", newNotification);
+                    const response = await axios.post(`${API_BASE_URL}/api/donors/notifications`, newNotification);
                     if (response.status === 201) {
                         console.log("Notification saved to backend:", response.data);
                         fetchNotificationDetails(); // Refresh notifications
@@ -157,7 +158,7 @@ function DonorDashboard() {
     const deleteNotification = async (patientId) => {
         const email = getEmailFromToken();
         try {
-            const response = await axios.post("http://localhost:5000/api/donors/deletenotifications", { email, patientId });
+            const response = await axios.post(`${API_BASE_URL}/api/donors/deletenotifications`, { email, patientId });
             if (response.status === 201) {
                 console.log("Notification deleted:", response.data);
                 fetchNotificationDetails(); // Refresh notifications

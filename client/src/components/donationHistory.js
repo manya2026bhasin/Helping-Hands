@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/donationHistory.css";
 import bloodDropImage from "../images/blood-drop.png";
+import API_BASE_URL from "../apiconfig";
 import heartHands from "../images/heart-hands.png";
 
 function DonationHistory({ getEmailFromToken }) {
@@ -13,7 +14,7 @@ function DonationHistory({ getEmailFromToken }) {
 
         const fetchHistory = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/api/donors/history/${email}`);
+                const response = await axios.get(`${API_BASE_URL}/api/donors/history/${email}`);
                 setHistory(response.data.data);
                 console.log(history);
             } catch (error) {
