@@ -26,7 +26,6 @@ const Rewards = ({getEmailFromToken}) => {
         try {
             const response = await axios.get(`${API_BASE_URL}/api/donors/points/${email}`);
             setTotalPoints(response.data.data);
-            console.log(totalPoints);
         } catch (error) {
             console.error("Error fetching donor's points:", error);
         }
