@@ -1,5 +1,5 @@
 # HelpingHands
-HelpingHands is a comprehensive blood donation management platform aimed at connecting donors and recipients while providing advanced features to track donations, monitor health, and reward donors for their contributions.
+HelpingHands is a comprehensive blood donation management platform aimed at connecting donors and recipients while providing advanced features to track donations, monitor health, and reward donors for their contributions. The site is live now on https://helping-hands-frontend.onrender.com/
 
 ## Features
 
