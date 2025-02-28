@@ -312,6 +312,16 @@ app.post("/api/otherdonors/deletenotifications", async (req, res) => {
             }
         }
 
+        // const updatedPatient = await Patient.findByIdAndUpdate(
+        //     patientId,
+        //     {donorId: donor.donorId},
+        //     {new: true}
+        // );
+
+        // if(!updatedPatient){
+        //     return res.status(404).json({succes: false, message: "Patient not found"});
+        // }
+
         res.status(200).json({ success: true, message: "Notifications updated for all donors except the specified donor" });
 
     } catch (error) {

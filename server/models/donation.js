@@ -49,8 +49,7 @@ const patientSchema = new mongoose.Schema({
         default: Date.now,
     },
     donorId: {
-        type: String,
-        unique: true
+        type: String
     }
 });
 
