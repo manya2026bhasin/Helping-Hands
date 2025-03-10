@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-
+import DonorHealth from "./donorHealth.js"; // Adjust path if needed
 // Define the schema for a donor
 const donorSchema = new mongoose.Schema({
     fullname: {
@@ -52,7 +52,7 @@ const donorSchema = new mongoose.Schema({
     },
     availabilityStatus: {
         type: Boolean,
-        default: false // true if available to donate, false otherwise
+        default: true // true if available to donate, false otherwise
     },
     notifications: [
         {
@@ -193,11 +193,51 @@ export const updateDonations = async (donorId, patientId, date) => {
             throw new Error("Donor not found");
         }
 
-        donor.donations.push({patientId, date});
+        // Add donation record
+        donor.donations.push({ patientId, date });
+        donor.lastDonationDate = date;
+        donor.availabilityStatus = false;
         await donor.save();
+
+        // Update donor availability status in DonorHealth model
+        const updatedDonorHealth = await DonorHealth.findOneAndUpdate(
+            { donorId },
+            { isAvailable: false, lastDonationDate: date },
+            { new: true }
+        );
+
+        if (!updatedDonorHealth) {
+            throw new Error("DonorHealth record not found for this donor");
+        }
+
     } catch (error) {
-        console.error("Error adding donation data to donor:", error);
+        console.error("Error updating donation data and availability:", error);
         throw error;
+    }
+};
+
+
+export const updateAllDonorsAvailability = async () => {
+    try {
+        const threeMonthsAgo = new Date();
+        threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+
+        // Update Donor model
+        const updatedDonors = await Donor.updateMany(
+            { lastDonationDate: { $lte: threeMonthsAgo } },
+            { $set: { availabilityStatus: true } }
+        );
+
+        // Update DonorHealth model
+        const updatedDonorHealth = await DonorHealth.updateMany(
+            { lastDonationDate: { $lte: threeMonthsAgo } },
+            { $set: { isAvailable: true } }
+        );
+
+        console.log(`Updated ${updatedDonors.modifiedCount} donors in Donor model.`);
+        console.log(`Updated ${updatedDonorHealth.modifiedCount} donors in DonorHealth model.`);
+    } catch (error) {
+        console.error("Error updating donors' availability status:", error);
     }
 };
 

@@ -26,8 +26,8 @@ const patientSchema = new mongoose.Schema({
     contactInfo: {
         email: {
             type: String,
-            required: true,
-            unique: true
+            required: true
+            // unique: true
         },
         phone: {
             type: String,
@@ -47,10 +47,10 @@ const patientSchema = new mongoose.Schema({
     date: {
         type: Date,
         default: Date.now,
-    },
-    donorId: {
-        type: String
     }
+    // donorId: {
+    //     type: String
+    // }
 });
 
 // Apply AutoIncrement plugin

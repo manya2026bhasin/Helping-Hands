@@ -7,12 +7,13 @@ import nodemailer from 'nodemailer';
 import http from "http";
 import mongoose from "mongoose";
 import { Server } from "socket.io";
-import Patient from "./models/donation.js";
-import { findPatientById } from "./models/donation.js";
+import Patient from "./models/patient.js";
+import { findPatientById } from "./models/patient.js";
 import DonationHistory from "./models/donationHistory.js";
 import DonorHealth from "./models/donorHealth.js";
+import cron from "node-cron";
 import { updateAvailability } from "./models/donorHealth.js";
-import { addDonor, findAvailableDonors, findAllDonors, findDonorByEmail, updateDonations } from "./models/donorModel.js";  // Import MongoDB functions
+import { addDonor, findAvailableDonors, findAllDonors, findDonorByEmail, updateDonations, updateAllDonorsAvailability } from "./models/donorModel.js";  // Import MongoDB functions
 import { log } from "console";
 
 dotenv.config();
@@ -37,6 +38,12 @@ const io = new Server(server, {
         origin: "*",
         methods: ["GET", "POST"],
     }
+});
+
+// Run every day at midnight (00:00) to update the availability status of donors
+cron.schedule("0 0 * * *", async () => {
+    console.log("Running daily donor availability update...");
+    await updateAllDonorsAvailability();
 });
 
 // Sign Up
@@ -287,6 +294,8 @@ app.post("/api/donor/health", async (req, res) => {
         );
 
         donor.availabilityStatus = isAvailable;
+        donor.lastDonationDate = lastDonationDate;
+        await donor.save();
         res.status(200).json({ success: true, donorHealth });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });

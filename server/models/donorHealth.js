@@ -10,6 +10,11 @@ const donorHealthSchema = new mongoose.Schema({
     isAvailable: { type: Boolean, default: true },
 });
 
+donorHealthSchema.pre("save", function (next) {
+    this.isAvailable = this.haemoglobin >= 12.5 && this.weight >= 50 && !this.recentIllnesses;
+    next();
+});
+
 const DonorHealth = mongoose.model("DonorHealth", donorHealthSchema);
 
 export const updateAvailability = async (donorId,isAvailable) => {

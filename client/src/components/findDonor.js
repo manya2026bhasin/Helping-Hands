@@ -18,6 +18,7 @@ function FindDonor() {
         latitude: null,
         longitude: null
     });
+    const [buttonDisabled, setButtonDisabled] = useState(false);
     const geo = navigator.geolocation;
     const navigate = useNavigate();
     async function handleSubmit(e) {
@@ -25,6 +26,7 @@ function FindDonor() {
         if(form.latitude == null){
             alert("please provide access to your location");
         }
+        setButtonDisabled(true);
         try {
             const result = await axios.post(`${API_BASE_URL}/api/find-donor`, form);
             if (result.status === 200) {
@@ -37,6 +39,7 @@ function FindDonor() {
         catch (error) {
             console.error('Error sending data:', error);
             alert('Error submitting the form');
+            setButtonDisabled(false);
         }
     }
 
@@ -63,7 +66,8 @@ function FindDonor() {
             latitude: latitude,
             longitude: longitude
         }));
-        alert(`Latitude: ${latitude}, Longitude: ${longitude}`);
+        // Check whether location is being rendered or not
+        // alert(`Latitude: ${latitude}, Longitude: ${longitude}`);
     }
 
     function handleError(error) {
@@ -129,7 +133,7 @@ function FindDonor() {
                         <button type="button" onClick={findPatient}>Access Location</button>
                     </div>
                     <div>
-                        <button className="form-submit" type="submit">SUBMIT</button>
+                        <button className="form-submit" type="submit" disabled={buttonDisabled}>{buttonDisabled ? "Submitting..." : "SUBMIT"}</button>
                     </div>
                 </form>
             </div>
